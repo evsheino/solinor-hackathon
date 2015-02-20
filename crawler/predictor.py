@@ -62,12 +62,17 @@ languages = {
     },
 }
 
+
 class Predictor():
 
     backend_languages = []
     frontend_languages = []
 
     def __init__(self, url, dom):
+        """
+        :type url: pattern.web.URL
+        :type dom: pattern.web.DOM
+        """
         self.url = url
         self.dom = dom
 
@@ -104,3 +109,9 @@ class Predictor():
         #remove duplicates
         self.backend_languages = list(set(self.backend_languages))
         self.frontend_languages = list(set(self.frontend_languages))
+
+    def get_webserver(self):
+        if 'server' in self.url.headers:
+            return self.url.headers['server']
+        else:
+            return None

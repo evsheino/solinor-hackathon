@@ -3,6 +3,7 @@ from pattern.web import URL, DOM, plaintext
 from pattern.web import NODE, TEXT, COMMENT, ELEMENT, DOCUMENT
 from predictor import Predictor
 
+
 class Site(models.Model):
     url = models.CharField(max_length=500)
     ip_address = models.CharField(max_length=500)
@@ -16,9 +17,10 @@ class Site(models.Model):
 
     #used for crawling and analyzing the website
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        super(Site, self).__init__(*args, **kwargs)
         self.dom = None
-        self.p_url = None #pattern url object
+        self.p_url = None  # pattern url object
         self.predictor = None
 
     def __unicode__(self):
@@ -32,6 +34,7 @@ class Site(models.Model):
 
         self.predictor = Predictor(self.p_url, self.dom)
 
+        self.webserver = self.predictor.get_webserver()
         self.predictor.predict_programming_language()
 
 
