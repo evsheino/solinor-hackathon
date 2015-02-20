@@ -64,6 +64,9 @@ languages = {
 
 class Predictor():
 
+    backend_languages = []
+    frontend_languages = []
+
     def __init__(self, url, dom):
         self.url = url
         self.dom = dom
@@ -92,8 +95,12 @@ class Predictor():
 
         for lang in languages.keys():
             for e in list(used_extensions):
-                if e in languages[lang]['extensions'] \
-                    and languages[lang]['type'] == 'backend':
-                    return lang
+                if e in languages[lang]['extensions']:
+                    if languages[lang]['type'] == 'backend':
+                        backend_languages.append(lang)
+                    elif languages[lang]['type'] == 'frontend':
+                        frontend_languages.append(lang)
 
-        return None
+        #remove duplicates
+        backend_languages = list(set(backend_languages))
+        front_languages = list(set(front_languages))
