@@ -99,8 +99,14 @@ class Predictor():
         title2 = self.url.domain
         #open another link other than the index
 
+        limit = 5
+        i = 0
         if self.local_links:
             for u in self.local_links:
+
+                if i >= limit:
+                    break
+                    
                 url = URL(u)
                 if url.path != self.url.path:
                     dom2 = DOM(url.download(cached=True, unicode=True))
@@ -108,6 +114,8 @@ class Predictor():
 
                     title2 = re.sub("[\W\d]+", " ", title2.strip())
                     title_words.extend(title2.split(' '))
+
+                    i += 1
 
         #i am sleep, I dont know what am doing, 
         #get the name of the company from the most repeated word in titles
