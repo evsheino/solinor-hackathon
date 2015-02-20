@@ -30,13 +30,16 @@ class Site(models.Model):
         self.url = url
 
         self.p_url = URL(url)
-        self.dom = DOM(self.p_url.download(cached=True))
+        self.dom = DOM(self.p_url.download(cached=True, unicode=True))
 
         self.predictor = Predictor(self.p_url, self.dom)
 
         self.webserver = self.predictor.get_webserver()
         self.predictor.predict_programming_language()
         self.predictor.predict_frontend()
+        self.predictor.predict_name()
+        self.predictor.predict_logo()
+
 
 
 
