@@ -112,7 +112,7 @@ class Predictor():
         #i am sleep, I dont know what am doing, 
         #get the name of the company from the most repeated word in titles
         self.name = Counter(title_words).most_common(1)[0][0]
-        
+
 
         
 
@@ -184,23 +184,14 @@ class Predictor():
         self.frontend_languages = list(set(self.frontend_languages))
 
 
-    def predict_logo(self):
-        '''
-        get the logo of a website from css
-        '''
+    def find_logo_in_css(self, css):
         import tinycss
-
         parser = tinycss.make_parser('page3')
-
-        for css_url in self.css:
-            url = URL(css_url)
-            content = url.download(cached=True)
-            stylesheet = parser.parse_stylesheet(content)
-
-            for rule in stylesheet.rules:
+        stylesheet = parser.parse_stylesheet(css)
+        for rule in stylesheet.rules:
                 if type(rule) is not tinycss.css21.RuleSet:
                     continue
-                selector = rule.selector
+                selector = str(rule.selector).lower()
                 #if 'logo' in selector.as_css():
                 for dec in rule.declarations:
                     if 'background' in dec.name:
@@ -212,21 +203,23 @@ class Predictor():
                         if not img_url:
                             continue
 
-                        link = abs(img_url, base=url.redirect or url.string)
-                        if link and url.domain in link:
+                        link = abs(img_url, base=self.url.redirect or self.url.string)
+                        if link: # and self.url.domain in link:
+                            link = link.lower()
                             if '?' in link:
                                 link = link[:link.find('?')]
 
                             e = extension(link)
+
                             if e and e[1:] in ['png', 'jpg', 'jpeg']: #if has extension and it is an image
                                 #does any have logo? 
-                                if 'logo' in link.lower():
+                                if 'logo' in link:
                                     self.logo = link
                                     return
                                 elif 'logo' in selector:
                                     self.logo = link
                                     return
-                                if 'brand' in link.lower():
+                                if 'brand' in link:
                                     self.logo = link
                                     return
                                 elif 'brand' in selector:
@@ -236,12 +229,46 @@ class Predictor():
                                 else:
                                     self.css_images.append((img_url, link)) #0 base, 1 full
 
+    def predict_logo(self):
+        '''
+        get the logo of a website from css
+        '''
+        for css_url in self.css:
+            url = URL(css_url)
+            content = url.download(cached=True)
+            self.find_logo_in_css(content)
+
+        if self.logo:
+            return
+        #:\ STILL NOT FOUND!!!
+        #maybe they are hiding it inside html style!
+
+        for style in self.dom('style'):
+            content = plaintext(style.content)
+            self.find_logo_in_css(content)            
+
+        if self.logo:
+            return
+
+        #if not found yet!! they are doing it using inline-css -.- WHY?
+        for div in self.dom('div'):
+            style = div.attrs.get('style', "")
+
+            content = 'div { ' + str(style) + ' }'
+            self.find_logo_in_css(content)                    
+
+        if self.logo:
+            return
 
         #logo is not found yet :O!!
         #does any of the images have company name?
+        name_lower = self.name.lower()
         for img_url, full_url in self.css_images:
-            if self.name in img_url:
+            if name_lower in img_url:
                 self.logo = full_url
+                return
+
+
 
 
     def get_webserver(self):
