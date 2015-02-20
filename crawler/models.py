@@ -33,6 +33,7 @@ class Site(models.Model):
         self.predictor = Predictor(self.p_url, self.dom)
 
         self.predictor.predict_programming_language()
+        self.predictor.predict_frontend()
 
 
 

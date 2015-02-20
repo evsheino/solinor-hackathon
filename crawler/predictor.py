@@ -64,12 +64,15 @@ languages = {
 
 class Predictor():
 
-    backend_languages = []
-    frontend_languages = []
-
     def __init__(self, url, dom):
         self.url = url
         self.dom = dom
+
+        self.backend_languages = []
+        self.frontend_languages = []
+
+        self.css = [] #list of css files
+        self.js = [] #list of js files
 
 
     def predict_programming_language(self):
@@ -98,9 +101,40 @@ class Predictor():
                 if e in languages[lang]['extensions']:
                     if languages[lang]['type'] == 'backend':
                         self.backend_languages.append(lang)
-                    elif languages[lang]['type'] == 'frontend':
-                        self.frontend_languages.append(lang)
 
         #remove duplicates
         self.backend_languages = list(set(self.backend_languages))
+        
+    def predict_frontend(self):
+        used_extensions = set()
+        #check urls
+        #if local and ends with one of the extentions, predict language
+        for link in self.dom.by_tag("link"):
+            link = link.attrs.get("href","")
+            link = abs(link, base=self.url.redirect or self.url.string)
+            if self.url.domain in link: 
+                e = extension(link)
+                if e:
+                    used_extensions.add(e[1:]) #add extension, and omit the .
+                    if 'css' in e:
+                        self.css.append(link)
+
+        #forms
+        for link in self.dom.by_tag("script"):
+            link = link.attrs.get("src","")
+            link = abs(link, base=self.url.redirect or self.url.string)
+            if self.url.domain in link: 
+                e = extension(link)
+                if e:
+                    used_extensions.add(e[1:]) #add extension, and omit the .
+                    if 'js' in e:
+                        self.js.append(link)
+
+        for lang in languages.keys():
+            for e in list(used_extensions):
+                if e in languages[lang]['extensions']:
+                    if languages[lang]['type'] == 'frontend':
+                        self.frontend_languages.append(lang)
+
+        #remove duplicates
         self.frontend_languages = list(set(self.frontend_languages))
