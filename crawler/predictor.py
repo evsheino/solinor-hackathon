@@ -8,59 +8,117 @@ from collections import Counter
 languages = {
     'ASP.NET' : {
         'type': 'backend',
-        'extensions' : ['asp', 'aspx', 'axd', 'asx', 'asmx', 'ashx', 'axd', 'asx', 'asmx', 'ashx']
+        'extensions' : ['asp', 'aspx', 'axd', 'asx', 'asmx', 'ashx', 'axd', 'asx', 'asmx', 'ashx'],
+        'frameworks' : [
+            'ASP.NET MVC Framework',
+            'Base One Foundation Component Library',
+            'Component-based Scalable Logical Architecture',
+            'MonoRail',
+            'OpenRasta',
+        ]
     },
     'CSS' : {
         'type': 'frontend',
-        'extensions' : ['css']
+        'extensions' : ['css'],
+        'frameworks' : [],
     },
     'Coldfusion' : {
         'type': 'backend',
-        'extensions' : ['cfm']
+        'extensions' : ['cfm'],
+        'frameworks' : ['CFWheels', 'ColdBox Platform', 'ColdSpring', 'Fusebox', 'Mach-II', 'Model-Glue'],
     },
     'Erlang' : {
         'type': 'backend',
-        'extensions' : ['yaws']
+        'extensions' : ['yaws'],
+        'frameworks' : [],
     },
     'Flash' : {
         'type': 'frontend',
-        'extensions' : ['swf']
+        'extensions' : ['swf'],
+        'frameworks' : [],
     },
     'HTML' : {
         'type': 'frontend',
-        'extensions' : ['html', 'htm', 'xhtml', 'jhtml']
+        'extensions' : ['html', 'htm', 'xhtml', 'jhtml'],
+        'frameworks' : [],
     },
     'Java' : {
         'type': 'backend',
-        'extensions' : ['jsp', 'jspx', 'wss', 'do', 'action']
+        'extensions' : ['jsp', 'jspx', 'wss', 'do', 'action'],
+        'frameworks' : [
+            'Apache Click'
+            'Apache OFBiz'
+            'Apache Shale'
+            'Apache Sling'
+            'Apache Struts 2'
+            'Apache Tapestry'
+            'Apache Wicket'
+            'AppFuse'
+            'Brutos Framework'
+            'Crux'
+            'Eclipse RAP'
+            'FormEngine'
+            'Grails'
+            'Google Web Toolkit'
+            'Hamlets'
+            'ItsNat'
+            'JavaServer Faces (Mojarra)'
+            'JBoss Seam'
+            'Jspx-bay'
+            'JVx'
+            'OpenLaszlo'
+            'OpenXava'
+            'Oracle ADF'
+            'Play'
+            'RIFE'
+            'Spark'
+            'Spring'
+            'Stripes'
+            'ThinWire'
+            'Vaadin'
+            'VRaptor'
+            'Wavemaker'
+            'WebObjects'
+            'WebWork'
+            'Ze Framework'
+            'ZK'
+            'ztemplates',
+        ],
     },
     'JavaScript' : {
         'type': 'frontend',
-        'extensions' : ['js']
+        'extensions' : ['js'],
+        'frameworks' : [],
     },
     'Perl' : {
         'type': 'backend',
-        'extensions' : ['pl']
+        'extensions' : ['pl'],
+        'frameworks' : [],
     },
     'PHP' : {
         'type': 'backend',
-        'extensions' : ['php', 'php4', 'php5', 'phtml']
+        'extensions' : ['php', 'php4', 'php5', 'phtml'],
+        'frameworks' : [],
     },
     'Python' : {
         'type': 'backend',
-        'extensions' : ['py']
+        'extensions' : ['py'],
+        'frameworks' : [],
     },
     'Ruby' : {
         'type': 'backend',
-        'extensions' : ['rb', 'rhtml']
+        'extensions' : ['rb', 'rhtml'],
+        'frameworks' : [],
     },
     'XML' : {
         'type': 'frontend',
-        'extensions' : ['xml', 'rss', 'svg']
+        'extensions' : ['xml', 'rss', 'svg'],
+        'frameworks' : [],
     },
     'C++' : {
         'type': 'backend',
-        'extensions' : ['c', 'cgi', 'dll']
+        'extensions' : ['c', 'cgi', 'dll'],
+        'frameworks' : ['Saetta Web Server', 'CppCMS', 'Poco', 'Tntnet', 'Wt'],
     },
 }
 
@@ -106,7 +164,7 @@ class Predictor():
 
                 if i >= limit:
                     break
-                    
+
                 url = URL(u)
                 if url.path != self.url.path:
                     dom2 = DOM(url.download(cached=True, unicode=True))
@@ -266,9 +324,19 @@ class Predictor():
         if self.logo:
             return
 
+        name_lower = self.name.lower()
+        #get images
+        for img in self.dom('img'):
+            src = img.attrs.get('src', '')
+            if 'logo' in src.lower() or name_lower in src.lower():
+                self.logo =  abs(src, base=self.url.redirect or self.url.string)
+                return
+
+        if self.logo:
+            return
+
         #logo is not found yet :O!!
         #does any of the images have company name?
-        name_lower = self.name.lower()
         for img_url, full_url in self.css_images:
             if name_lower in img_url:
                 self.logo = full_url
