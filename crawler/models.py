@@ -8,11 +8,6 @@ class Site(models.Model):
     ip_address = models.CharField(max_length=500)
     location = models.CharField(max_length=100, blank=True)
     company_name = models.CharField(max_length=500, blank=True)
-    webserver = models.CharField(max_length=50, blank=True)
-    programming_language = models.CharField(max_length=50, blank=True)
-    certificate = models.CharField(max_length=500, blank=True)
-    certificate_authority = models.CharField(max_length=500, blank=True)
-    html_version = models.CharField(max_length=500, blank=True)
 
     #used for crawling and analyzing the website
     dom = None
@@ -32,5 +27,10 @@ class Site(models.Model):
 		self.programming_language = p.predict_programming_language()
 
 
-
-
+class SiteTechnologies(models.Model):
+    site = models.OneToOneField(Site, related_name='site_technologies')
+    webserver = models.CharField(max_length=50, blank=True)
+    programming_language = models.CharField(max_length=50, blank=True)
+    certificate = models.CharField(max_length=500, blank=True)
+    certificate_authority = models.CharField(max_length=500, blank=True)
+    html_version = models.CharField(max_length=500, blank=True)
