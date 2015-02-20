@@ -112,8 +112,6 @@ class Predictor():
         #i am sleep, I dont know what am doing, 
         #get the name of the company from the most repeated word in titles
         self.name = Counter(title_words).most_common(1)[0][0]
-
-
         
 
 
@@ -267,8 +265,6 @@ class Predictor():
             if name_lower in img_url:
                 self.logo = full_url
                 return
-
-
 
 
     def get_webserver(self):
