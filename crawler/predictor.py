@@ -71,8 +71,8 @@ class Predictor():
         self.url = url
         self.dom = dom
 
-    def predict_programming_language(self):
 
+    def predict_programming_language(self):
         used_extensions = set()
         #check urls
         #if local and ends with one of the extentions, predict language
@@ -97,10 +97,10 @@ class Predictor():
             for e in list(used_extensions):
                 if e in languages[lang]['extensions']:
                     if languages[lang]['type'] == 'backend':
-                        backend_languages.append(lang)
+                        self.backend_languages.append(lang)
                     elif languages[lang]['type'] == 'frontend':
-                        frontend_languages.append(lang)
+                        self.frontend_languages.append(lang)
 
         #remove duplicates
-        backend_languages = list(set(backend_languages))
-        front_languages = list(set(front_languages))
+        self.backend_languages = list(set(self.backend_languages))
+        self.frontend_languages = list(set(self.frontend_languages))

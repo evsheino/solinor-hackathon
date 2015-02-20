@@ -15,21 +15,24 @@ class Site(models.Model):
     html_version = models.CharField(max_length=500, blank=True)
 
     #used for crawling and analyzing the website
-    dom = None
-    p_url = None #pattern url object
+
+    def __init__(self):
+        self.dom = None
+        self.p_url = None #pattern url object
+        self.predictor = None
 
     def __unicode__(self):
         return self.url
 
     def crawl(self, url):
-		self.url = url
+        self.url = url
 
-		self.p_url = URL(url)
-		self.dom = DOM(self.p_url.download(cached=True))
+        self.p_url = URL(url)
+        self.dom = DOM(self.p_url.download(cached=True))
 
-		p = Predictor(self.p_url, self.dom)
+        self.predictor = Predictor(self.p_url, self.dom)
 
-		self.programming_language = p.predict_programming_language()
+        self.predictor.predict_programming_language()
 
 
 
