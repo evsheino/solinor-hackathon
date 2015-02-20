@@ -109,7 +109,6 @@ class Predictor():
 
         #remove duplicates
         self.backend_languages = list(set(self.backend_languages))
-<<<<<<< HEAD
         
     def predict_frontend(self):
         used_extensions = set()
@@ -144,12 +143,9 @@ class Predictor():
 
         #remove duplicates
         self.frontend_languages = list(set(self.frontend_languages))
-=======
-        self.frontend_languages = list(set(self.frontend_languages))
 
     def get_webserver(self):
         if 'server' in self.url.headers:
             return self.url.headers['server']
         else:
             return None
->>>>>>> 80b779630a87a2cb404fcbc5d066adf177370b0d
