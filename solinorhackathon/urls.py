@@ -1,15 +1,7 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from crawler.models import Site
-from rest_framework import routers, serializers, viewsets
-
-class SiteSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Site
-
-class SiteViewSet(viewsets.ModelViewSet):
-    queryset = Site.objects.all()
-    serializer_class = SiteSerializer
+from crawler.views import SiteViewSet
+from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register(r'sites', SiteViewSet)
