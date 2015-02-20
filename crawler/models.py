@@ -18,6 +18,9 @@ class Site(models.Model):
     dom = None
     p_url = None #pattern url object
 
+    def __unicode__(self):
+        return self.url
+
     def crawl(self, url):
 		self.url = url
 
