@@ -29,7 +29,7 @@ class Location(models.Model):
 class Site(models.Model):
     url = models.CharField(max_length=500)
     ip_address = models.CharField(max_length=500)
-    location = models.ForeignKey(Location, null=True)
+    location = models.ForeignKey(Location, null=True, related_name='sites')
     company_name = models.CharField(max_length=500, blank=True)
 
     #used for crawling and analyzing the website

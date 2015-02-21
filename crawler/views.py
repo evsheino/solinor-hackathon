@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from crawler.models import Site, SiteTechnologies
+from crawler.models import Site, SiteTechnologies, Location
 from rest_framework import serializers, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -14,6 +14,11 @@ class SiteSerializer(serializers.HyperlinkedModelSerializer):
         model = Site
 	fields = ('id', 'url', 'ip_address', 'location', 'company_name', 'site_technologies')
 
+class LocationSerializer(serializers.HyperlinkedModelSerializer):
+    sites = SiteSerializer(many=True, read_only=True)
+    class Meta:
+        model = Location
+
 class SiteTechnologiesViewSet(viewsets.ModelViewSet):
     queryset = SiteTechnologies.objects.all()
     serializer_class = SiteTechnologiesSerializer
@@ -21,6 +26,10 @@ class SiteTechnologiesViewSet(viewsets.ModelViewSet):
 class SiteViewSet(viewsets.ModelViewSet):
     queryset = Site.objects.all()
     serializer_class = SiteSerializer
+
+class LocationViewSet(viewsets.ModelViewSet):
+    queryset = Location.objects.all()
+    serializer_class = LocationSerializer
 
 class TopWebserversView(APIView):
     permission_classes = []
