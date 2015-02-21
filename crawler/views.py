@@ -51,6 +51,13 @@ class TopTechnologyView(APIView):
 	queryset = SiteTechnology.objects._top(technology)
 	return Response(queryset)
 
+class TopTechnologiesView(APIView):
+    permission_classes = []
+
+    def get(self, request):
+	queryset = SiteTechnology.objects.top_technologies()
+	return Response(queryset)
+
 class TopTechnologiesByCountriesView(APIView):
     permission_classes = []
 
