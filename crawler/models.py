@@ -8,6 +8,9 @@ class SiteTechnologyManager(models.Manager):
     def _top(self, technology):
         return super(SiteTechnologyManager, self).get_queryset().filter(tech_type=technology).values('value').annotate(count=models.Count('value')).order_by('-count')[:10]
 
+    def top_technologies(self):
+        return super(SiteTechnologyManager, self).get_queryset().values('value').annotate(count=models.Count('value')).order_by('-count')[:10]
+
     def top_webservers(self):
         return self._top('webserver')
 
