@@ -5,13 +5,17 @@ from predictor import Predictor
 
 class SiteTechnologyManager(models.Manager):
     def _top(self, technology):
-        return super(SiteTechnologyManager, self).get_queryset().values('value').annotate(count=models.Count(technology)).order_by('-count')[:10]
+        return super(SiteTechnologyManager, self).get_queryset().filter(tech_type=technology).values('value').annotate(count=models.Count('value')).order_by('-count')[:10]
 
     def top_webservers(self):
         return self._top('webserver')
 
     def top_programming_languages(self):
         return self._top('programming_language')
+
+    def top_technologies_by_country(self, country):
+        return super(SiteTechnologyManager, self).get_queryset().filter(site__location__country=country).values('value').annotate(count=models.Count('value')).order_by('-count')[:10]
+
 
 class Location(models.Model):
     country = models.CharField(max_length=2)

@@ -34,12 +34,19 @@ class TopWebserversView(APIView):
     permission_classes = []
 
     def get(self, request, format=None):
-	queryset = SiteTechnologies.objects.top_webservers()
+	queryset = SiteTechnology.objects.top_webservers()
+	return Response(queryset)
+
+class TopTechnologiesByCountryView(APIView):
+    permission_classes = []
+
+    def get(self, request, country):
+	queryset = SiteTechnology.objects.top_technologies_by_country(country)
 	return Response(queryset)
 
 class TopProgrammingLanguagesView(APIView):
     permission_classes = []
 
     def get(self, request, format=None):
-	queryset = SiteTechnologies.objects.top_programming_languages()
+	queryset = SiteTechnology.objects.top_programming_languages()
 	return Response(queryset)
