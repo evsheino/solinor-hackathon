@@ -2,6 +2,7 @@ from django.db import models
 from pattern.web import URL, DOM, plaintext
 from pattern.web import NODE, TEXT, COMMENT, ELEMENT, DOCUMENT
 from predictor import Predictor
+from django.db import connection
 
 class SiteTechnologyManager(models.Manager):
     def _top(self, technology):
@@ -15,6 +16,18 @@ class SiteTechnologyManager(models.Manager):
 
     def top_technologies_by_country(self, country):
         return super(SiteTechnologyManager, self).get_queryset().filter(site__location__country=country).values('value').annotate(count=models.Count('value')).order_by('-count')[:10]
+
+    def top_technologies_by_countries(self):
+        cursor = connection.cursor()
+        #return super(SiteTechnologyManager, self).get_queryset().values('site__location__country', 'value').annotate(count=models.Count('value')).order_by('-count')[:10]
+        cursor.execute(
+            "SELECT country, value, COUNT(value) AS tech_count \
+            FROM crawler_sitetechnology t INNER JOIN  \
+                crawler_site s ON t.site_id = s.id INNER JOIN \
+                crawler_location l ON s.location_id = l.id \
+            GROUP BY country, value")
+        return cursor.fetchall()
+        
 
 
 class Location(models.Model):
