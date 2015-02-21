@@ -219,8 +219,8 @@ class Predictor():
         self.name = None #name of the website
 
         self.domain = self.url.domain
-        self.w3 = W3Techs(self.domain)
-        self.w3.analyze()
+        self.w3 = None #W3Techs(self.domain)
+        #self.w3.analyze()
 
 
 
@@ -288,7 +288,7 @@ class Predictor():
                     if languages[lang]['type'] == 'backend':
                         self.backend_languages.append(lang)
 
-        if 'Server-side Programming Language' in self.w3.data:
+        if self.w3 and 'Server-side Programming Language' in self.w3.data:
             self.backend_languages.append(self.w3.data['Server-side Programming Language'])
 
         #remove duplicates
@@ -330,7 +330,7 @@ class Predictor():
                     if languages[lang]['type'] == 'frontend':
                         self.frontend_languages.append(lang)
 
-        if 'Client-side Programming Language' in self.w3.data:
+        if self.w3 and 'Client-side Programming Language' in self.w3.data:
             self.frontend_languages.append(self.w3.data['Client-side Programming Language'])
 
         #remove duplicates
