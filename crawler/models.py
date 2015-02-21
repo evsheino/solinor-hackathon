@@ -3,9 +3,9 @@ from pattern.web import URL, DOM, plaintext
 from pattern.web import NODE, TEXT, COMMENT, ELEMENT, DOCUMENT
 from predictor import Predictor
 
-class SiteManager(models.Manager):
+class SiteTechnologyManager(models.Manager):
     def _top(self, technology):
-        return super(SiteManager, self).get_queryset().values(technology).annotate(count=models.Count(technology)).order_by('-count')[:10]
+        return super(SiteTechnologyManager, self).get_queryset().values('value').annotate(count=models.Count(technology)).order_by('-count')[:10]
 
     def top_webservers(self):
         return self._top('webserver')
@@ -91,12 +91,12 @@ class Site(models.Model):
         for lang in back_langs:
             bf = self.predictor.frameworks.get(self.programming_language, [])
             for f in bf:
-                self.site_technologies.add(SiteTechnology(tech_type='backend_framework', value='f'))
+                self.site_technologies.add(SiteTechnology(tech_type='backend_framework', value=f))
                 
         for lang in front_langs:
             ff = self.predictor.frameworks.get(self.frontend_language, [])
             for f in ff:
-                self.site_technologies.add(SiteTechnology(tech_type='frontend_framework', value='f'))
+                self.site_technologies.add(SiteTechnology(tech_type='frontend_framework', value=f))
 
         self.location = self.predictor.predict_location()
 
