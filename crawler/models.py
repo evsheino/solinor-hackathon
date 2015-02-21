@@ -65,7 +65,7 @@ class Site(models.Model):
         self.company_name = self.predictor.name
 
         self.predictor.predict_logo()
-        self.logo_url = self.predictor.logo
+        self.logo_url = self.predictor.logo if self.predictor.logo else ""
 
         self.save()
 
