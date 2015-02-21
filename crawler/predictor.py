@@ -4,6 +4,8 @@ from pattern.web import NODE, TEXT, COMMENT, ELEMENT, DOCUMENT
 from pattern.web import abs, extension
 import re
 from collections import Counter
+from w3techs import W3Techs
+
 
 languages = {
     'ASP.NET' : {
@@ -46,69 +48,135 @@ languages = {
         'type': 'backend',
         'extensions' : ['jsp', 'jspx', 'wss', 'do', 'action'],
         'frameworks' : [
-            'Apache Click'
-            'Apache OFBiz'
-            'Apache Shale'
-            'Apache Sling'
-            'Apache Struts 2'
-            'Apache Tapestry'
-            'Apache Wicket'
-            'AppFuse'
-            'Brutos Framework'
-            'Crux'
-            'Eclipse RAP'
-            'FormEngine'
-            'Grails'
-            'Google Web Toolkit'
-            'Hamlets'
-            'ItsNat'
-            'JavaServer Faces (Mojarra)'
-            'JBoss Seam'
-            'Jspx-bay'
-            'JVx'
-            'OpenLaszlo'
-            'OpenXava'
-            'Oracle ADF'
-            'Play'
-            'RIFE'
-            'Spark'
-            'Spring'
-            'Stripes'
-            'ThinWire'
-            'Vaadin'
-            'VRaptor'
-            'Wavemaker'
-            'WebObjects'
-            'WebWork'
-            'Ze Framework'
-            'ZK'
+            'Apache Click',
+            'Apache OFBiz',
+            'Apache Shale',
+            'Apache Sling',
+            'Apache Struts 2',
+            'Apache Tapestry',
+            'Apache Wicket',
+            'AppFuse',
+            'Brutos Framework',
+            'Crux',
+            'Eclipse RAP',
+            'FormEngine',
+            'Grails',
+            'Google Web Toolkit',
+            'Hamlets',
+            'ItsNat',
+            'JavaServer Faces (Mojarra)',
+            'JBoss Seam',
+            'Jspx-bay',
+            'JVx',
+            'OpenLaszlo',
+            'OpenXava',
+            'Oracle ADF',
+            'Play',
+            'RIFE',
+            'Spark',
+            'Spring',
+            'Stripes',
+            'ThinWire',
+            'Vaadin',
+            'VRaptor',
+            'Wavemaker',
+            'WebObjects',
+            'WebWork',
+            'Ze Framework',
+            'ZK',
             'ztemplates',
         ],
     },
     'JavaScript' : {
         'type': 'frontend',
         'extensions' : ['js'],
-        'frameworks' : [],
+        'frameworks' : [
+            'AngularJS',
+            'KnockoutJS',
+            'Backbone.js',
+            'Ember.js',
+        ],
     },
     'Perl' : {
         'type': 'backend',
         'extensions' : ['pl'],
-        'frameworks' : [],
+        'frameworks' : [
+            'Catalyst',
+            'Dancer',
+            'Mason',
+            'Maypole',
+            'Mojolicious',
+        ],
     },
     'PHP' : {
         'type': 'backend',
         'extensions' : ['php', 'php4', 'php5', 'phtml'],
-        'frameworks' : [],
+        'frameworks' : [
+            'Agavi',
+            'Aiki Framework',
+            'AppFlower',
+            'Ayoola Framework',
+            'CakePHP',
+            'Cgiapp',
+            'ClanCatsFramework',
+            'CodeIgniter',
+            'Drupal',
+            'Fat-Free',
+            'FuelPHP',
+            'Hazaar MVC',
+            'Joomla',
+            'Kajona',
+            'Laravel',
+            'Lithium',
+            'Nette Framework',
+            'Phalcon',
+            'PHPixie',
+            'PRADO',
+            'Qcodo',
+            'Seagull',
+            'Silex',
+            'Symfony',
+            'TYPO3 Flow',
+            'Xyster Framework',
+            'Yii',
+            'Zend Framework',
+        ],
     },
     'Python' : {
         'type': 'backend',
         'extensions' : ['py'],
-        'frameworks' : [],
+        'frameworks' : [
+            'BlueBream',
+            'Bottle',
+            'CherryPy',
+            'CubicWeb',
+            'Django',
+            'Flask',
+            'Grok',
+            'Nagare',
+            'Pyjamas',
+            'Pylons',
+            'Pyramid',
+            'TACTIC',
+            'Tornado',
+            'TurboGears',
+            'web2py',
+            'Webware',
+            'Zope 2'
+        ],
     },
     'Ruby' : {
         'type': 'backend',
         'extensions' : ['rb', 'rhtml'],
-        'frameworks' : [],
+        'frameworks' : [
+            'Camping',
+            'Padrino',
+            'Ruby on Rails',
+            'Sinatra',
+            'Merb',
+            'PureMVC',
+            'Volt'
+        ],
     },
     'XML' : {
         'type': 'frontend',
@@ -139,11 +207,18 @@ class Predictor():
 
         self.css = [] #list of css files
         self.js = [] #list of js files
+        self.all_js = []
         self.local_links = []
         self.logo = None
         self.css_images = []
+        self.frameworks = {}
 
         self.name = None #name of the website
+
+        self.domain = self.url.domain
+        self.w3 = W3Techs(self.domain)
+        self.w3.analyze()
+
 
 
     def predict_name(self):
@@ -210,8 +285,12 @@ class Predictor():
                     if languages[lang]['type'] == 'backend':
                         self.backend_languages.append(lang)
 
+        if 'Server-side Programming Language' in self.w3.data:
+            self.backend_languages.append(self.w3.data['Server-side Programming Language'])
+
         #remove duplicates
         self.backend_languages = list(set(self.backend_languages))
+
         
     def predict_frontend(self):
         used_extensions = set()
@@ -231,18 +310,25 @@ class Predictor():
         for link in self.dom.by_tag("script"):
             link = link.attrs.get("src","")
             link = abs(link, base=self.url.redirect or self.url.string)
-            if self.url.domain in link: 
-                e = extension(link)
-                if e:
-                    used_extensions.add(e[1:]) #add extension, and omit the .
-                    if 'js' in e:
+            
+            e = extension(link)
+            if e:
+                used_extensions.add(e[1:]) #add extension, and omit the .
+                if 'js' in e:
+                    if self.url.domain in link: 
                         self.js.append(link)
+                    self.all_js.append(link)
+
+
 
         for lang in languages.keys():
             for e in list(used_extensions):
                 if e in languages[lang]['extensions']:
                     if languages[lang]['type'] == 'frontend':
                         self.frontend_languages.append(lang)
+
+        if 'Client-side Programming Language' in self.w3.data:
+            self.frontend_languages.append(self.w3.data['Client-side Programming Language'])
 
         #remove duplicates
         self.frontend_languages = list(set(self.frontend_languages))
@@ -341,6 +427,40 @@ class Predictor():
             if name_lower in img_url:
                 self.logo = full_url
                 return
+
+
+    def predict_frameworks(self):
+        # after we did get the languages used
+        #lets do the trivial thing.. ... ... ... 
+        # look if the any of the frameworks in the list are in the html page :D
+
+        #contents of html
+        html_content = str(self.dom).lower()
+        js_content = ""
+        for js in self.all_js:
+            content = URL(js).download()
+            js_content += str(content)
+
+        js_content = js_content.lower()
+
+
+        for lang in self.backend_languages + self.frontend_languages:
+            for framework in languages[lang]['frameworks']:
+                frm_lower = framework.lower()
+                #also check js content! Sometimes they are written in licenses..etc
+
+                if languages[lang]['type'] == 'backend':
+                    if frm_lower in html_content:
+                        if lang not in self.frameworks:
+                            self.frameworks[lang] = []
+                        self.frameworks[lang].append(framework)
+                elif languages[lang]['type'] == 'frontend':
+                    if frm_lower in js_content: 
+                        if lang not in self.frameworks:
+                            self.frameworks[lang] = []
+                        self.frameworks[lang].append(framework)
+                    
+                        
 
 
     def get_webserver(self):

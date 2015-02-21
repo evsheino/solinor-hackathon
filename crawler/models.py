@@ -34,6 +34,7 @@ class Site(models.Model):
         self.predictor.predict_frontend()
         self.predictor.predict_name()
         self.predictor.predict_logo()
+        self.predictor.predict_frameworks()
 
 
 

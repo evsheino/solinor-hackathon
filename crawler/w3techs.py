@@ -27,11 +27,11 @@ class W3Techs:
         for div in dom('.tech_main p')[1:]:
             # if it is header
             if 'si_h' in div.attrs.get('class', ''):
-                last_header = plaintext(div.content)
+                last_header = plaintext(div.content).strip('\n \t')
                 self.data[last_header] = None
             elif 'si_tech' in div.attrs.get('class', ''):
                 content = plaintext(div.content)
-                self.data[last_header] = content
+                self.data[last_header] = content.split('\n')[0]
 
             
 
