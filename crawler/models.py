@@ -35,12 +35,14 @@ class SiteTechnologyManager(models.Manager):
 
 class Location(models.Model):
     country = models.CharField(max_length=2)
+    country_full = models.CharField(max_length=50, default='')
     city = models.CharField(max_length=100, db_index=True)
     city_accent = models.CharField(max_length=100)
     region = models.CharField(max_length=10, null=True)
     population = models.IntegerField(default=0)
     latitude = models.FloatField()
     longitude = models.FloatField()
+
 
     def __unicode__(self):
         return "Country: %s, City: %s" % (self.country, self.city)

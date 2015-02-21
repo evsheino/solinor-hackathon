@@ -537,9 +537,18 @@ class Predictor():
                         continue
         for city_name in city_names:
             if country_name:
-                cities = models.Location.objects.filter(city=city_name, country=country_name).order_by('-population')
+                if len(country_name) == 2:
+                    cities = models.Location.objects.filter(city=city_name, country=country_name).order_by('-population')
+                else:
+                    cities = models.Location.objects.filter(city=city_name, country_full=country_name).order_by('-population')
             else:
                 cities = models.Location.objects.filter(city=city_name).order_by('-population')
             if cities.exists():
                 return cities[0]
+        # If we didn't get a match, try again without country data
+        if country_name:
+            for city_name in city_names:
+                cities = models.Location.objects.filter(city=city_name).order_by('-population')
+                if cities.exists():
+                    return cities[0]
         return None

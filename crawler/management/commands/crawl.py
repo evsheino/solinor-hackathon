@@ -9,12 +9,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for url in args:
+            self.stdout.write('Crawling site "%s"...' % url)
             s = Site()
             try:
                 s.crawl(url)
             except:
                 self.stdout.write('Failed to crawl site "%s": %s' % (url, sys.exc_info()[0]))
                 continue
-            self.stdout.write('Crawled site "%s"' % url)
+            self.stdout.write('Finished crawling site "%s"' % url)
             s.save()
 
