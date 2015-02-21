@@ -18,7 +18,7 @@ class Location(models.Model):
     city = models.CharField(max_length=100, db_index=True)
     city_accent = models.CharField(max_length=100)
     region = models.CharField(max_length=10, null=True)
-    population = models.IntegerField(null=True)
+    population = models.IntegerField(default=0)
     latitude = models.FloatField()
     longitude = models.FloatField()
 
