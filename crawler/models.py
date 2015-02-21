@@ -30,7 +30,11 @@ class SiteTechnologyManager(models.Manager):
                 crawler_location l ON s.location_id = l.id \
             GROUP BY country, value")
         return cursor.fetchall()
-        
+
+
+class SiteManager(models.Manager):
+    def sites_by_country(self, country):
+        return super(SiteManager, self).get_queryset().filter(location__country=country)
 
 
 class Location(models.Model):
@@ -62,6 +66,8 @@ class Site(models.Model):
     backend_framework = models.CharField(max_length=500, blank=True)
     frontend_framework = models.CharField(max_length=500, blank=True)
     logo_url = models.CharField(max_length=500, blank=True)
+
+    objects = SiteManager()
 
     #used for crawling and analyzing the website
 
