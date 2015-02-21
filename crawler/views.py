@@ -73,6 +73,7 @@ class TopProgrammingLanguagesView(APIView):
 	return Response(queryset)
 
 class SitesByCountryView(APIView):
+    permission_classes = []
 
     def get(self, request, country):
 	queryset = Site.objects.sites_by_country(country)
