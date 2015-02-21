@@ -211,6 +211,7 @@ class Predictor():
         self.css = [] #list of css files
         self.js = [] #list of js files
         self.all_js = []
+        self.all_css = []
         self.local_links = []
         self.logo = None
         self.css_images = []
@@ -305,17 +306,22 @@ class Predictor():
         for link in self.dom.by_tag("link"):
             link = link.attrs.get("href","")
             link = abs(link, base=self.url.redirect or self.url.string)
-            if self.url.domain in link: 
-                e = extension(link)
-                if e:
-                    used_extensions.add(e[1:]) #add extension, and omit the .
-                    if 'css' in e:
+            
+            e = extension(link)
+            if e:
+                used_extensions.add(e[1:]) #add extension, and omit the .
+                if 'css' in e:
+                    if self.url.domain in link: 
                         self.css.append(link)
+                    else:
+                        self.all_css.append(link)
 
         #forms
         for link in self.dom.by_tag("script"):
             link = link.attrs.get("src","")
-            link = abs(link, base=self.url.redirect or self.url.string)
+
+            if link.startswith('.') or link.startswith('/'):
+                link = abs(link, base=self.url.redirect or self.url.string)
             
             e = extension(link)
             if e:
@@ -340,14 +346,18 @@ class Predictor():
         self.frontend_languages = list(set(self.frontend_languages))
 
 
-    def find_logo_in_css(self, css):
+    def find_logo_in_css(self, css, url=None):
+
+        if not url:
+            url = self.url
+
         import tinycss
         parser = tinycss.make_parser('page3')
         stylesheet = parser.parse_stylesheet(css)
         for rule in stylesheet.rules:
                 if type(rule) is not tinycss.css21.RuleSet:
                     continue
-                selector = str(rule.selector).lower()
+                selector = rule.selector.as_css().lower()
                 #if 'logo' in selector.as_css():
                 for dec in rule.declarations:
                     if 'background' in dec.name:
@@ -359,7 +369,7 @@ class Predictor():
                         if not img_url:
                             continue
 
-                        link = abs(img_url, base=self.url.redirect or self.url.string)
+                        link = abs(img_url, base=url.redirect or url.string)
                         if link: # and self.url.domain in link:
                             link = link.lower()
                             if '?' in link:
@@ -419,10 +429,10 @@ class Predictor():
         name_lower = self.name.lower()
         #get images
         for img in self.dom('img'):
-            src = img.attrs.get('src', '')
-            img_id = img.attrs.get('id', '')
-            img_class = img.attrs.get('class', '')
-            if 'logo' in src.lower() or name_lower in src.lower() \
+            src = img.attrs.get('src', '').lower()
+            img_id = img.attrs.get('id', '').lower()
+            img_class = img.attrs.get('class', '').lower()
+            if 'logo' in src or name_lower in src.lower() \
                 or 'logo' in img_id or 'logo' in img_class:
                 self.logo =  abs(src, base=self.url.redirect or self.url.string)
                 return
@@ -436,6 +446,17 @@ class Predictor():
             if name_lower in img_url:
                 self.logo = full_url
                 return
+
+        if self.logo:
+            return
+
+        #if still not found, they are mostly using CDN with diff domain
+        #check all other css files
+        for css_url in self.all_css:
+            url = URL(css_url)
+            content = url.download(cached=True)
+            self.find_logo_in_css(content, url)
+
 
 
     def predict_frameworks(self):
