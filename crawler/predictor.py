@@ -319,9 +319,9 @@ class Predictor():
 
         #forms
         for script_link in self.dom.by_tag("script"):
-            link = script_link.attrs.get("src","")
+            link = script_link.attrs.get("src","").lower()
 
-            if link.startswith('.') or link.startswith('/'):
+            if not link.startswith('h'):
                 link = abs(link, base=self.url.redirect or self.url.string)
             
             e = extension(link)
@@ -475,8 +475,10 @@ class Predictor():
         html_content = str(self.dom).lower()
         js_content = ""
         for js in self.all_js:
-            if js.startswith('.') or js.startswith('/'):
+            js = js.lower()
+            if not js.startswith('h'):
                 js = abs(js, base=self.url.redirect or self.url.string)
+
             content = URL(js).download()
             js_content += str(content)
 
