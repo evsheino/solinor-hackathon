@@ -417,7 +417,10 @@ class Predictor():
         #get images
         for img in self.dom('img'):
             src = img.attrs.get('src', '')
-            if 'logo' in src.lower() or name_lower in src.lower():
+            img_id = img.attrs.get('id', '')
+            img_class = img.attrs.get('class', '')
+            if 'logo' in src.lower() or name_lower in src.lower() \
+                or 'logo' in img_id or 'logo' in img_class:
                 self.logo =  abs(src, base=self.url.redirect or self.url.string)
                 return
 
