@@ -141,6 +141,7 @@ languages = {
             'Silex',
             'Symfony',
             'TYPO3 Flow',
+            'Wordpress',
             'Xyster Framework',
             'Yii',
             'Zend Framework',
@@ -478,9 +479,11 @@ class Predictor():
             js = js.lower()
             if not js.startswith('h'):
                 js = abs(js, base=self.url.redirect or self.url.string)
-
-            content = URL(js).download()
-            js_content += str(content)
+            try:
+                content = URL(js).download()
+                js_content += str(content)
+            except:
+                print 'Warn: Failed to fetch url "%s": %s' % (js, sys.exc_info()[0])
 
         js_content = js_content.lower()
 
