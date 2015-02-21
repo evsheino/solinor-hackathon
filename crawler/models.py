@@ -41,8 +41,6 @@ class Site(models.Model):
     frontend_framework = models.CharField(max_length=500, blank=True)
     logo_url = models.CharField(max_length=500, blank=True)
 
-    objects = SiteManager()
-
     #used for crawling and analyzing the website
 
     def __init__(self, *args, **kwargs):
@@ -106,3 +104,5 @@ class SiteTechnology(models.Model):
     site = models.ForeignKey(Site, related_name='site_technologies')
     tech_type = models.CharField(max_length=500)
     value = models.CharField(max_length=500, blank=True)
+
+    objects = SiteTechnologyManager()
