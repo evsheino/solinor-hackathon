@@ -233,6 +233,7 @@ class Predictor():
         title_words.extend(title1.split(' '))
 
         title2 = self.url.domain
+        #title_words.extend(title2.split('.'))
         #open another link other than the index
 
         limit = 5
@@ -242,16 +243,18 @@ class Predictor():
 
                 if i >= limit:
                     break
+                try:
+                    url = URL(u)
+                    if url.path != self.url.path:
+                        dom2 = DOM(url.download(cached=True, unicode=True))
+                        title2 = plaintext(str(dom2('title')[0]))
 
-                url = URL(u)
-                if url.path != self.url.path:
-                    dom2 = DOM(url.download(cached=True, unicode=True))
-                    title2 = plaintext(str(dom2('title')[0]))
+                        title2 = re.sub("[\W\d]+", " ", title2.strip())
+                        title_words.extend(title2.split(' '))
 
-                    title2 = re.sub("[\W\d]+", " ", title2.strip())
-                    title_words.extend(title2.split(' '))
-
-                    i += 1
+                        i += 1
+                except:
+                    pass
 
         #i am sleep, I dont know what am doing, 
         #get the name of the company from the most repeated word in titles

@@ -64,34 +64,40 @@ class Site(models.Model):
         self.dom = DOM(self.p_url.download(cached=True, unicode=True))
 
         self.predictor = Predictor(self.p_url, self.dom)
+        webserver = self.predictor.get_webserver()
 
+        #ORDER MATTERS!! DONT CHANGE THIS
+        self.predictor.predict_programming_language()
+        self.predictor.predict_frontend()
+        self.predictor.predict_frameworks()
         self.predictor.predict_name()
-        self.company_name = self.predictor.name
-
         self.predictor.predict_logo()
+        self.location = self.predictor.predict_location()
+        #YOU CAN CHANGE AFTER THAT
+        self.company_name = self.predictor.name
         self.logo_url = self.predictor.logo if self.predictor.logo else ""
 
         self.save()
 
-        webserver = self.predictor.get_webserver()
+        
         if webserver:
             self.site_technologies.add(SiteTechnology(tech_type='webserver', value=webserver))
 
-        self.predictor.predict_programming_language()
+        
         back_langs = []
         if self.predictor.backend_languages:
             for lang in self.predictor.backend_languages:
                 back_langs.append(lang)
                 self.site_technologies.add(SiteTechnology(tech_type='backend_language', value=lang))
 
-        self.predictor.predict_frontend()
+        
         front_langs = []
         if self.predictor.frontend_languages:
             for lang in self.predictor.frontend_languages:
                 front_langs.append(lang)
                 self.site_technologies.add(SiteTechnology(tech_type='frontend_language', value=lang))
 
-        self.predictor.predict_frameworks()
+        
         for lang in back_langs:
             bf = self.predictor.frameworks.get(self.programming_language, [])
             for f in bf:
@@ -102,7 +108,6 @@ class Site(models.Model):
             for f in ff:
                 self.site_technologies.add(SiteTechnology(tech_type='frontend_framework', value=f))
 
-        self.location = self.predictor.predict_location()
 
         self.save()
 
