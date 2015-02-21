@@ -13,10 +13,23 @@ class SiteTechnologiesManager(models.Manager):
     def top_programming_languages(self):
         return self._top('programming_language')
 
+class Location(models.Model):
+    country = models.CharField(max_length=2)
+    city = models.CharField(max_length=100, db_index=True)
+    city_accent = models.CharField(max_length=100)
+    region = models.CharField(max_length=10, null=True)
+    population = models.CharField(max_length=20, null=True)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+
+    def __unicode__(self):
+        return "Country: %s, City: %s" % (self.country, self.city)
+
+
 class Site(models.Model):
     url = models.CharField(max_length=500)
     ip_address = models.CharField(max_length=500)
-    location = models.CharField(max_length=100, blank=True)
+    location = models.ForeignKey(Location, null=True)
     company_name = models.CharField(max_length=500, blank=True)
 
     #used for crawling and analyzing the website
@@ -44,6 +57,8 @@ class Site(models.Model):
         self.predictor.predict_name()
         self.predictor.predict_logo()
         self.predictor.predict_frameworks()
+        self.location = self.predictor.predict_location()
+        self.save()
 
 
 class SiteTechnologies(models.Model):

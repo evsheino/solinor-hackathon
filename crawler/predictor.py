@@ -5,6 +5,9 @@ from pattern.web import abs, extension
 import re
 from collections import Counter
 from w3techs import W3Techs
+from whois import whois
+from urlparse import urlparse
+import models
 
 
 languages = {
@@ -468,3 +471,17 @@ class Predictor():
             return self.url.headers['server']
         else:
             return None
+
+    def predict_location(self):
+        o = urlparse(self.url.__str__())
+        w = whois(o.hostname)
+        # names of fields which might got a city name
+        city_fields = ["address:", "registrant city:"]
+        for line in w.text.lower().split('\n'):
+            for field_name in city_fields:
+                if field_name in line:
+                    cityname = line.split(field_name, 1)[1].strip()
+                    cities = models.Location.objects.filter(city=cityname)
+                    if cities.exists():
+                        return cities[0]
+        return None
