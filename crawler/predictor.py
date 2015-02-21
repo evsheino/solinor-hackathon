@@ -275,6 +275,8 @@ class Predictor():
             if self.url.domain in link: 
                 e = extension(link)
                 if e:
+                    if '?' in e:
+                        e = e.split('?', 1)[0]
                     used_extensions.add(e[1:]) #add extension, and omit the .
                 else:
                     self.local_links.append(link)
@@ -286,6 +288,8 @@ class Predictor():
             if self.url.domain in link: 
                 e = extension(link)
                 if e:
+                    if '?' in e:
+                        e = e.split('?, 1')[0]
                     used_extensions.add(e[1:]) #add extension, and omit the .
 
         for lang in languages.keys():
