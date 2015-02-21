@@ -69,7 +69,9 @@ class Site(models.Model):
 
         self.save()
 
-        self.site_technologies.add(SiteTechnology(tech_type='webserver', value=self.predictor.get_webserver()))
+        webserver = self.predictor.get_webserver()
+        if webserver:
+            self.site_technologies.add(SiteTechnology(tech_type='webserver', value=webserver))
 
         self.predictor.predict_programming_language()
         back_langs = []
