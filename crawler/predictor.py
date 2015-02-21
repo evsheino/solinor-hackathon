@@ -480,8 +480,11 @@ class Predictor():
         for line in w.text.lower().split('\n'):
             for field_name in city_fields:
                 if field_name in line:
-                    cityname = line.split(field_name, 1)[1].strip()
-                    cities = models.Location.objects.filter(city=cityname)
+                    try:
+                        cityname = line.split(field_name, 1)[1].strip()
+                    except KeyError:
+                        continue
+                    cities = models.Location.objects.filter(city=cityname).order_by('-population')
                     if cities.exists():
                         return cities[0]
         return None

@@ -18,7 +18,7 @@ class Location(models.Model):
     city = models.CharField(max_length=100, db_index=True)
     city_accent = models.CharField(max_length=100)
     region = models.CharField(max_length=10, null=True)
-    population = models.CharField(max_length=20, null=True)
+    population = models.IntegerField(null=True)
     latitude = models.FloatField()
     longitude = models.FloatField()
 
@@ -40,6 +40,7 @@ class Site(models.Model):
         self.p_url = None  # pattern url object
         self.predictor = None
 
+
     def __unicode__(self):
         return self.url
 
@@ -58,7 +59,6 @@ class Site(models.Model):
         self.predictor.predict_logo()
         self.predictor.predict_frameworks()
         self.location = self.predictor.predict_location()
-        self.save()
 
 
 class SiteTechnologies(models.Model):
