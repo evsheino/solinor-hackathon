@@ -77,4 +77,4 @@ class SitesByCountryView(APIView):
 
     def get(self, request, country):
 	queryset = Site.objects.sites_by_country(country)
-	return Response(SiteSerializer(queryset, many=True, context={'request': request).data)
+	return Response(SiteSerializer(queryset, many=True, context={'request': request}).data)
