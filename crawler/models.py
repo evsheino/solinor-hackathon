@@ -69,11 +69,13 @@ class Site(models.Model):
         self.company_name = self.predictor.name
 
         self.predictor.predict_logo()
-        self.logo_url = self.predictor.logo
+        self.logo_url = self.predictor.logo if self.predictor.logo else ""
 
         self.save()
 
-        self.site_technologies.add(SiteTechnology(tech_type='webserver', value=self.predictor.get_webserver()))
+        webserver = self.predictor.get_webserver()
+        if webserver:
+            self.site_technologies.add(SiteTechnology(tech_type='webserver', value=webserver))
 
         self.predictor.predict_programming_language()
         back_langs = []
