@@ -114,24 +114,21 @@ class Site(models.Model):
                 back_langs.append(lang)
                 self.site_technologies.add(SiteTechnology(tech_type='backend_language', value=lang))
 
-        
         front_langs = []
         if self.predictor.frontend_languages:
             for lang in self.predictor.frontend_languages:
                 front_langs.append(lang)
                 self.site_technologies.add(SiteTechnology(tech_type='frontend_language', value=lang))
 
-        
         for lang in back_langs:
-            bf = self.predictor.frameworks.get(self.programming_language, [])
+            bf = self.predictor.frameworks.get(lang, [])
             for f in bf:
                 self.site_technologies.add(SiteTechnology(tech_type='backend_framework', value=f))
                 
         for lang in front_langs:
-            ff = self.predictor.frameworks.get(self.frontend_language, [])
+            ff = self.predictor.frameworks.get(lang, [])
             for f in ff:
                 self.site_technologies.add(SiteTechnology(tech_type='frontend_framework', value=f))
-
 
         self.save()
 
