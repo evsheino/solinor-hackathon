@@ -502,7 +502,10 @@ class Predictor():
 
     def get_webserver(self):
         if 'server' in self.url.headers:
-            return self.url.headers['server']
+            server = self.url.headers['server']
+            if '/' in server:
+                return server.split('/', 1)[0]
+            return
         else:
             return None
 
