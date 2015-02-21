@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from crawler.views import SiteViewSet, SiteTechnologyViewSet, TopWebserversView, TopProgrammingLanguagesView, LocationViewSet, TopTechnologiesByCountryView
+from crawler.views import SiteViewSet, SiteTechnologyViewSet, TopWebserversView, TopProgrammingLanguagesView, LocationViewSet, TopTechnologiesByCountryView, TopTechnologiesByCountriesView
 from rest_framework import routers
 
 router = routers.DefaultRouter()
@@ -13,6 +13,7 @@ urlpatterns = patterns('',
     # url(r'^$', 'solinorhackathon.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
     url(r'^top_webservers/$', TopWebserversView.as_view(), name='topservers'),
+    url(r'^top_technologies_by_countries/$', TopTechnologiesByCountriesView.as_view(), name='toptechsbycountries'),
     url(r'^top_technologies_by_country/(?P<country>[a-zA-Z]+)$', TopTechnologiesByCountryView.as_view(), name='toptechsbycountry'),
     url(r'^top_programming_languages/$', TopProgrammingLanguagesView.as_view(), name='toplanguages'),
     url(r'^', include(router.urls)),
