@@ -133,3 +133,6 @@ class SiteTechnology(models.Model):
     value = models.CharField(max_length=500, blank=True)
 
     objects = SiteTechnologyManager()
+
+    def __unicode__(self):
+        return 'Type: %s, value: %s' % (self.tech_type, self.value)

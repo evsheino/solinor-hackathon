@@ -98,6 +98,7 @@ languages = {
             'KnockoutJS',
             'Backbone.js',
             'Ember.js',
+            'jQuery',
         ],
     },
     'Perl' : {
@@ -303,8 +304,8 @@ class Predictor():
         used_extensions = set()
         #check urls
         #if local and ends with one of the extentions, predict language
-        for link in self.dom.by_tag("link"):
-            link = link.attrs.get("href","")
+        for css_link in self.dom.by_tag("link"):
+            link = css_link.attrs.get("href","")
             link = abs(link, base=self.url.redirect or self.url.string)
             
             e = extension(link)
@@ -317,8 +318,8 @@ class Predictor():
                         self.all_css.append(link)
 
         #forms
-        for link in self.dom.by_tag("script"):
-            link = link.attrs.get("src","")
+        for script_link in self.dom.by_tag("script"):
+            link = script_link.attrs.get("src","")
 
             if link.startswith('.') or link.startswith('/'):
                 link = abs(link, base=self.url.redirect or self.url.string)
@@ -331,6 +332,12 @@ class Predictor():
                         self.js.append(link)
                     self.all_js.append(link)
 
+        html_str = str(self.dom)
+        if html_str.find('.css'):
+            used_extensions.add('css') 
+
+        if html_str.find('.js'):
+            used_extensions.add('js') 
 
 
         for lang in languages.keys():
@@ -495,7 +502,10 @@ class Predictor():
 
     def get_webserver(self):
         if 'server' in self.url.headers:
-            return self.url.headers['server']
+            server = self.url.headers['server']
+            if '/' in server:
+                return server.split('/', 1)[0]
+            return
         else:
             return None
 
