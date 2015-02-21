@@ -21,11 +21,11 @@ class SiteTechnologyManager(models.Manager):
         cursor = connection.cursor()
         #return super(SiteTechnologyManager, self).get_queryset().values('site__location__country', 'value').annotate(count=models.Count('value')).order_by('-count')[:10]
         cursor.execute(
-            "SELECT country, COUNT(value) AS tech_count \
+            "SELECT country, value, COUNT(value) AS tech_count \
             FROM crawler_sitetechnology t INNER JOIN  \
                 crawler_site s ON t.site_id = s.id INNER JOIN \
                 crawler_location l ON s.location_id = l.id \
-            GROUP BY country")
+            GROUP BY country, value")
         return cursor.fetchall()
         
 
