@@ -475,6 +475,8 @@ class Predictor():
         html_content = str(self.dom).lower()
         js_content = ""
         for js in self.all_js:
+            if js.startswith('.') or js.startswith('/'):
+                js = abs(js, base=self.url.redirect or self.url.string)
             content = URL(js).download()
             js_content += str(content)
 
