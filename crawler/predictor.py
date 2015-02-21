@@ -502,16 +502,30 @@ class Predictor():
     def predict_location(self):
         o = urlparse(self.url.__str__())
         w = whois(o.hostname)
+        # names of fields which might got a country name
+        country_fields = ['countrycode:', 'registrant country:']
+        country_name = None
         # names of fields which might got a city name
-        city_fields = ["address:", "registrant city:"]
+        city_fields = ['address:', 'registrant city:']
+        city_names = []
         for line in w.text.lower().split('\n'):
+            for field_name in country_fields:
+                if field_name in line:
+                    try:
+                        country_name = line.split(field_name, 1)[1].strip()
+                    except KeyError:
+                        continue
             for field_name in city_fields:
                 if field_name in line:
                     try:
-                        cityname = line.split(field_name, 1)[1].strip()
+                        city_names.append(line.split(field_name, 1)[1].strip())
                     except KeyError:
                         continue
-                    cities = models.Location.objects.filter(city=cityname).order_by('-population')
-                    if cities.exists():
-                        return cities[0]
+        for city_name in city_names:
+            if country_name:
+                cities = models.Location.objects.filter(city=city_name, country=country_name).order_by('-population')
+            else:
+                cities = models.Location.objects.filter(city=city_name).order_by('-population')
+            if cities.exists():
+                return cities[0]
         return None
