@@ -3,6 +3,15 @@ from pattern.web import URL, DOM, plaintext
 from pattern.web import NODE, TEXT, COMMENT, ELEMENT, DOCUMENT
 from predictor import Predictor
 
+class SiteTechnologiesManager(models.Manager):
+    def _top(self, technology):
+        return super(SiteTechnologiesManager, self).get_queryset().values(technology).annotate(count=models.Count(technology)).order_by('-count')[:10]
+
+    def top_webservers(self):
+        return self._top('webserver')
+
+    def top_programming_languages(self):
+        return self._top('programming_language')
 
 class Site(models.Model):
     url = models.CharField(max_length=500)
@@ -37,7 +46,6 @@ class Site(models.Model):
         self.predictor.predict_frameworks()
 
 
-
 class SiteTechnologies(models.Model):
     site = models.OneToOneField(Site, related_name='site_technologies')
     webserver = models.CharField(max_length=50, blank=True)
@@ -45,3 +53,5 @@ class SiteTechnologies(models.Model):
     certificate = models.CharField(max_length=500, blank=True)
     certificate_authority = models.CharField(max_length=500, blank=True)
     html_version = models.CharField(max_length=500, blank=True)
+
+    objects = SiteTechnologiesManager()
