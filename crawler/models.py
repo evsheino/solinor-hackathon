@@ -63,29 +63,46 @@ class Site(models.Model):
 
         self.predictor = Predictor(self.p_url, self.dom)
 
-        self.webserver = self.predictor.get_webserver()
-
-        self.predictor.predict_programming_language()
-        self.programming_language = self.predictor.backend_languages[0] if self.predictor.backend_languages else ''
-
-        self.predictor.predict_frontend()
-        self.frontend_language = self.predictor.frontend_languages[0] if self.predictor.frontend_languages else ''
-
         self.predictor.predict_name()
         self.company_name = self.predictor.name
 
         self.predictor.predict_logo()
         self.logo_url = self.predictor.logo
 
-        self.predictor.predict_frameworks()
-        bf = self.predictor.frameworks.get(self.programming_language, None)
-        self.backend_framework = bf[0] if bf else ''
+        self.save()
 
-        bf = self.predictor.frameworks.get(self.frontend_language, None)
-        self.backend_framework = bf[0] if bf else ''
+        self.site_technologies.add(SiteTechnology(tech_type='webserver', value=self.predictor.get_webserver()))
+
+        self.predictor.predict_programming_language()
+        back_langs = []
+        if self.predictor.backend_languages:
+            for lang in self.predictor.backend_languages:
+                back_langs.append(lang)
+                self.site_technologies.add(SiteTechnology(tech_type='backend_language', value=lang))
+
+        self.predictor.predict_frontend()
+        front_langs = []
+        if self.predictor.frontend_languages:
+            for lang in self.predictor.frontend_languages:
+                front_langs.append(lang)
+                self.site_technologies.add(SiteTechnology(tech_type='frontend_language', value=lang))
+
+        self.predictor.predict_frameworks()
+        for lang in back_langs:
+            bf = self.predictor.frameworks.get(self.programming_language, [])
+            for f in bf:
+                self.site_technologies.add(SiteTechnology(tech_type='backend_framework', value='f'))
+                
+        for lang in front_langs:
+            ff = self.predictor.frameworks.get(self.frontend_language, [])
+            for f in ff:
+                self.site_technologies.add(SiteTechnology(tech_type='frontend_framework', value='f'))
 
         self.location = self.predictor.predict_location()
 
+        self.save()
 
-class SiteTechnologies(models.Model):
-    site = models.OneToOneField(Site, related_name='site_technologies')
+class SiteTechnology(models.Model):
+    site = models.ForeignKey(Site, related_name='site_technologies')
+    tech_type = models.CharField(max_length=500)
+    value = models.CharField(max_length=500, blank=True)

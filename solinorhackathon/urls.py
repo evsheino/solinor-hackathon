@@ -1,11 +1,11 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from crawler.views import SiteViewSet, SiteTechnologiesViewSet, TopWebserversView, TopProgrammingLanguagesView, LocationViewSet
+from crawler.views import SiteViewSet, SiteTechnologyViewSet, TopWebserversView, TopProgrammingLanguagesView, LocationViewSet
 from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register(r'sites', SiteViewSet)
-router.register(r'site_technologies', SiteTechnologiesViewSet)
+router.register(r'site_technologies', SiteTechnologyViewSet)
 router.register(r'locations', LocationViewSet)
 
 urlpatterns = patterns('',

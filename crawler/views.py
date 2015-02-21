@@ -1,27 +1,26 @@
 from django.shortcuts import render
-from crawler.models import Site, SiteTechnologies, Location
+from crawler.models import Site, SiteTechnology, Location
 from rest_framework import serializers, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-class SiteTechnologiesSerializer(serializers.HyperlinkedModelSerializer):
+class SiteTechnologySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = SiteTechnologies
+        model = SiteTechnology
 
 class SiteSerializer(serializers.HyperlinkedModelSerializer):
-    site_technologies = SiteTechnologiesSerializer(many=False, read_only=True)
+    site_technologies = SiteTechnologySerializer(many=True, read_only=True)
     class Meta:
         model = Site
-	fields = ('id', 'url', 'ip_address', 'location', 'company_name', 'site_technologies')
 
 class LocationSerializer(serializers.HyperlinkedModelSerializer):
     sites = SiteSerializer(many=True, read_only=True)
     class Meta:
         model = Location
 
-class SiteTechnologiesViewSet(viewsets.ModelViewSet):
-    queryset = SiteTechnologies.objects.all()
-    serializer_class = SiteTechnologiesSerializer
+class SiteTechnologyViewSet(viewsets.ModelViewSet):
+    queryset = SiteTechnology.objects.all()
+    serializer_class = SiteTechnologySerializer
 
 class SiteViewSet(viewsets.ModelViewSet):
     queryset = Site.objects.all()
